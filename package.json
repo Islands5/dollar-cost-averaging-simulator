@@ -1,0 +1,29 @@
+{
+  "name": "react_training",
+  "version": "1.0.0",
+  "description": "",
+  "devDependencies": {
+    "@babel/preset-react": "^7.13.13",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@types/react-router-dom": "^5.1.7",
+    "axios": "^0.21.1",
+    "prettier": "^2.2.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "ts-loader": "^8.1.0",
+    "typescript": "^4.2.4",
+    "webpack": "^5.33.2",
+    "webpack-cli": "^4.6.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build": "webpack",
+    "watch": "webpack -w"
+  },
+  "author": "islands5",
+  "license": "MIT"
+}
