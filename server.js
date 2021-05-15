@@ -7,14 +7,10 @@ const port = 3000;
 const server = http.createServer((req, res) => {
   let url, contentType;
   contentType = {"Content-Type": "text/html"}
-  if(req.url.startsWith('/dist/')){
-    url = `public${req.url}`
-  }else if(req.url.startsWith('/data/')) {
-    // サンプルのjsonデータを置いとく
-    url = `public${req.url}`
-    contentType = {"Content-Type": "application/json; charset=UTF-8"}
+  if(req.url.startsWith('/dollar-cost-averaging-simulator/dist/')){
+    url = `${req.url}`.replace('/dollar-cost-averaging-simulator/', '')
   }else{
-    url = 'public/index.html'
+    url = 'index.html'
   }
   console.log(url)
   if (fs.existsSync(url)) {
