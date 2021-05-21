@@ -1,23 +1,23 @@
-import { ChartData } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
 import React from 'react';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 
-export const ReturnGraph: React.FC<{data: ChartData}> = ({data}) => {
-  const options = {
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: true
-        }
-      }]
-    }
+export const ReturnGraph: React.FC<{data: ChartData, options: ChartOptions, type: String}> = ({data, options, type}) => {
+  if(type === 'bar') {
+    return (
+      <Bar
+        data={data}
+        options={options}
+        type='bar'
+      />
+    );
+  }else{
+    return (
+      <Line
+        data={data}
+        options={options}
+        type='line'
+      />
+    )
   }
-
-  return (
-    <Bar
-      data={data}
-      options={options}
-      type="bar"
-    />
-  );
 };

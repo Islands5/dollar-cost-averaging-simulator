@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 
-import { Chart, ChartData } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
 
 import { getRandomInt } from '../utils/random'
 
@@ -8,6 +8,8 @@ import { StockGraph } from '../graphs/stock_graph'
 import { ReturnGraph } from '../graphs/return_graph'
 
 import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
@@ -18,6 +20,14 @@ export const TopPage: FC = () => {
   const defaultNumberOfDigit = 100
   const defaultOffset = 300
   const defaultGrowthRate = 3
+  const defaultType = "bar"
+  const options: ChartOptions = {
+    scales: {
+      yAxes: {
+        min: 0
+      }
+    }
+  }
 
   const [numberOfData, setNumberOfData] = useState(defaultNumberOfData)
   const [distData, setDistData] = useState(defaultDistData)
@@ -25,6 +35,7 @@ export const TopPage: FC = () => {
   const [offset, setOffset] = useState(defaultOffset)
   const [growthRate, setGrowthRate] = useState(defaultGrowthRate)
   const [data, setData] = useState<ChartData>({labels: [], datasets: []})
+  const [graphType, setGraphType] = useState(defaultType)
 
   let labels: string[] = []
   let distValues: number[] = []
@@ -45,6 +56,10 @@ export const TopPage: FC = () => {
     setGrowthRate(Number(target.querySelector<HTMLInputElement>('#js-growth-rate')!.value))
   }
 
+  const handleGraphTypeChange =  (event: React.ChangeEvent<{ value: unknown }>) => {
+    setGraphType(event.target.value as string);
+  }; 
+
   const calcValues = () => {
     labels = []
 
@@ -62,8 +77,10 @@ export const TopPage: FC = () => {
       datasets: [{
         label: '値動き',
         data: distValues,
-        backgroundColor: ['rgba(255, 99, 132, 0.2)'],
-        borderWidth: 1
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 0.2)',
+        borderWidth: 3,
+        tension: 0
       }]
     })
   }
@@ -78,11 +95,9 @@ export const TopPage: FC = () => {
 
   const [money, setMoney] = useState(100000)
   const [returnData, setReturnData] = useState<ChartData>({labels: [], datasets: []})
-  let bulkBuyUnits: number[]
-  let splitBuyUnits: number[]
+  const [returnGraphType, setReturnGraphType] = useState(defaultType)
 
   const handleItemSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log('click')
     const { target } = event;
 
     if (!(target instanceof HTMLFormElement)) {
@@ -93,6 +108,10 @@ export const TopPage: FC = () => {
 
     setMoney(Number(target.querySelector<HTMLInputElement>('#js-money')!.value))
   }
+  
+  const handleReturnGraphTypeChange =  (event: React.ChangeEvent<{ value: unknown }>) => {
+    setReturnGraphType(event.target.value as string);
+  }; 
 
   const calcUnit = () => {
     labels = []
@@ -104,8 +123,8 @@ export const TopPage: FC = () => {
     const distValues = data.datasets[0] && data.datasets[0].data
     if(typeof(distValues) === 'undefined' || distValues.length === 0){ return }
 
-    bulkBuyUnits = []
-    splitBuyUnits = []
+    let bulkBuyUnits: number[] = []
+    let splitBuyUnits: number[] = []
 
     for(let i = 1; i <= numberOfData; i++) {
       bulkBuyUnits.push(money / Number(distValues[0]))
@@ -127,12 +146,16 @@ export const TopPage: FC = () => {
         label: '口数',
         data: bulkBuyUnits,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderWidth: 1
+        borderColor: 'rgba(75, 192, 192, 0.2)',
+        borderWidth: 1,
+        tension: 0
       },{
         label: '口数(ドルコスト平均法)',
         data: splitBuyUnits,
         backgroundColor: 'rgba(255, 159, 64, 0.2)',
-        borderWidth: 1
+        borderColor: 'rgba(255, 159, 64, 0.2)',
+        borderWidth: 1,
+        tension: 0
       }]
     })
   }
@@ -144,6 +167,26 @@ export const TopPage: FC = () => {
   useEffect(() => {
     calcUnit()
   }, [money, data])
+
+  const valueOf35YearsLater = () => {
+    return data.datasets[0] && data.datasets[0].data.slice(-1)[0]
+  }
+
+  const lastOfBulkUnit = () => {
+    return returnData.datasets[0] && returnData.datasets[0].data.slice(-1)[0]
+  }
+
+  const lastOfSplitUnit = () => {
+    return returnData.datasets[1] && returnData.datasets[1].data.slice(-1)[0]
+  }
+
+  const bulkUnit2money = () => {
+    return valueOf35YearsLater() * lastOfBulkUnit()
+  }
+
+  const splitUnit2money = () => {
+    return valueOf35YearsLater() * lastOfSplitUnit()
+  }
 
   return (
     <React.Fragment>
@@ -169,6 +212,15 @@ export const TopPage: FC = () => {
               </Box>
             </Box>
             <Box display="flex" alignItems="center" justifyContent="flex-end" mt={4}>
+              <Box component="div" width="18%">
+                <Select
+                  value={graphType}
+                  onChange={handleGraphTypeChange}
+                >
+                  <MenuItem value={'bar'}>棒グラフ</MenuItem>
+                  <MenuItem value={'line'}>折れ線</MenuItem>
+                </Select>
+              </Box>
               <Box component="div" width="10%">
                 <Button variant="contained" color="primary" type="submit">変更</Button>
               </Box>
@@ -176,7 +228,7 @@ export const TopPage: FC = () => {
           </form>
         </Box>
         <Box mt={4}>
-          <StockGraph data={data} />
+          <StockGraph data={data} options={options} type={graphType}/>
         </Box>
         <h2>口数の推移</h2>
         <Box mt={4}>
@@ -185,6 +237,17 @@ export const TopPage: FC = () => {
               <Box component="div" width="40%">
                 <TextField type="number" id="js-money"            label="購入金額"   defaultValue="100000"  />
               </Box>
+            </Box>
+            <Box display="flex" alignItems="center" justifyContent="flex-end" mt={4}>
+              <Box component="div" width="18%">
+                <Select
+                  value={returnGraphType}
+                  onChange={handleReturnGraphTypeChange}
+                >
+                  <MenuItem value={'bar'}>棒グラフ</MenuItem>
+                  <MenuItem value={'line'}>折れ線</MenuItem>
+                </Select>
+              </Box>
               <Box component="div" width="10%">
                 <Button variant="contained" color="primary" type="submit">変更</Button>
               </Box>
@@ -192,7 +255,12 @@ export const TopPage: FC = () => {
           </form>
         </Box>
         <Box mt={4}>
-          <ReturnGraph data={returnData} />
+          <div>
+            { /* TODO: もっとシンプルに計算結果をかけると思うけど、140行目辺りにまとめる関数を追加してもうまく計算されない*/ }
+            <p>口数: { Math.ceil(bulkUnit2money()) } ({ Math.ceil(100 * ( bulkUnit2money() / money)) }%)</p>
+            <p>口数(ド): { Math.ceil(splitUnit2money()) } ({ Math.ceil(100 * ( splitUnit2money() / money)) }%)</p>
+          </div>
+          <ReturnGraph data={returnData} options={options} type={returnGraphType}/>
         </Box>
       </Container>
     </React.Fragment>
