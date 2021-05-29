@@ -75,10 +75,10 @@ export const TopPage: FC = () => {
     setData({
       labels,
       datasets: [{
-        label: '値動き',
+        label: '商品Aの価格',
         data: distValues,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 0.2)',
+        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+        borderColor: 'rgba(255, 99, 132, 0.8)',
         borderWidth: 3,
         tension: 0
       }]
@@ -145,15 +145,15 @@ export const TopPage: FC = () => {
       datasets: [{
         label: '口数',
         data: bulkBuyUnits,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 0.2)',
+        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+        borderColor: 'rgba(75, 192, 192, 0.8)',
         borderWidth: 1,
         tension: 0
       },{
         label: '口数(ドルコスト平均法)',
         data: splitBuyUnits,
-        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-        borderColor: 'rgba(255, 159, 64, 0.2)',
+        backgroundColor: 'rgba(255, 159, 64, 0.8)',
+        borderColor: 'rgba(255, 159, 64, 0.8)',
         borderWidth: 1,
         tension: 0
       }]
@@ -181,17 +181,17 @@ export const TopPage: FC = () => {
   }
 
   const bulkUnit2money = () => {
-    return valueOf35YearsLater() * lastOfBulkUnit()
+    return Number(valueOf35YearsLater()) * Number(lastOfBulkUnit())
   }
 
   const splitUnit2money = () => {
-    return valueOf35YearsLater() * lastOfSplitUnit()
+    return Number(valueOf35YearsLater()) * Number(lastOfSplitUnit())
   }
 
   return (
     <React.Fragment>
       <Container maxWidth="sm">
-        <h2>値段が変わる商品</h2>
+        <h2>値動きのある商品(円)</h2>
         <Box mt={4}>
           <form action="" onSubmit={handleStockSubmit}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -256,9 +256,8 @@ export const TopPage: FC = () => {
         </Box>
         <Box mt={4}>
           <div>
-            { /* TODO: もっとシンプルに計算結果をかけると思うけど、140行目辺りにまとめる関数を追加してもうまく計算されない*/ }
-            <p>口数: { Math.ceil(bulkUnit2money()) } ({ Math.ceil(100 * ( bulkUnit2money() / money)) }%)</p>
-            <p>口数(ド): { Math.ceil(splitUnit2money()) } ({ Math.ceil(100 * ( splitUnit2money() / money)) }%)</p>
+            <p>{numberOfData} 年目時点の金額: { Math.ceil(bulkUnit2money()) }円 ({ Math.ceil(100 * ( bulkUnit2money() / money)) }%)</p>
+            <p>{numberOfData} 年目時点の金額(ドルコスト): { Math.ceil(splitUnit2money()) }円 ({ Math.ceil(100 * ( splitUnit2money() / money)) }%)</p>
           </div>
           <ReturnGraph data={returnData} options={options} type={returnGraphType}/>
         </Box>
